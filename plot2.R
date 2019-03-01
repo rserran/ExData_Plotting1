@@ -1,0 +1,32 @@
+## John Hopkins University Exploratory Data Analysis Course Project 1
+## Plot #2 (plot2.R)
+
+## First step is to download to ./data directory
+if(!file.exists("./data")){dir.create("./data")}
+file_url <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+download.file(file_url, destfile="./data/dataset.zip")
+unzip("./data/dataset.zip")
+
+## install.package(data.table), library(data.table)
+install.packages("data.table")
+library(data.table)
+
+## read text file with fread (faster)
+power_df <- fread(file.path("data", "household_power_consumption.txt"), 
+                  header = TRUE, sep = ";", na.strings = "?")
+
+## subset dates from "1/2/2007" to "2/2/2007"
+subset_power_df <- power_df[Date %in% c("1/2/2007", "2/2/2007") ,]
+rm(power_df)
+
+## change Date and Time variables to POSIXlt
+subset_power_df$DateTime <- strptime(paste(subset_power_df$Date, subset_power_df$Time, 
+                                           sep = " "), "%d/%m/%Y %H:%M:%S")
+
+## create plot (DateTime, Global_active_power)
+## output png file
+png("plot2.png", width = 480, height = 480)
+
+with(subset_power_df, plot(DateTime, Global_active_power, type = "l", 
+                           xlab = "", ylab = "Global Active Power (kilowatts)"))
+dev.off()
